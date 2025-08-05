@@ -1,4 +1,4 @@
-name: Build and Deploy to CPanel via FTP
+name: Build Frontend Assets and Upload to CPanel via FTP
 
 on:
   push:
@@ -6,48 +6,31 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy-assets:
     runs-on: ubuntu-latest
 
     steps:
       - name: ⬇️ Clone Repository
         uses: actions/checkout@v3
 
-      - name: 📦 Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: 🧩 Install PHP Dependencies
-        run: composer install --no-dev --optimize-autoloader
-
       - name: 🧩 Install Node Dependencies
         run: npm install
 
-      - name: ⚙️ Build Vite
+      - name: ⚙️ Build Vite Assets
         run: npm run build
 
-      - name: 🧹 Clean Unused Files
-        run: |
-          rm -rf node_modules
-          rm -rf tests
-          rm -rf .git
-          rm -rf .github
-
-      - name: 📁 Upload All Files via FTP
+      - name: 📁 Upload `public/build` via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_TARGET_PATH }}
-          local-dir: ./
+          server-dir: ${{ secrets.FTP_TARGET_PATH }}/public/build
+          local-dir: public/build
           exclude: |
             **/.git*
-            **/node_modules/**
-            **/tests/**
