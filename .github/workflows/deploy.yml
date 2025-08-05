@@ -32,5 +32,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_TARGET_PATH }}/public/build/
           local-dir: public/build/
+          dangerous-clean-slate: true
           exclude: |
             **/.git*
